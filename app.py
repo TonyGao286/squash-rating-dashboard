@@ -53,6 +53,15 @@ st.markdown(
         max-width: 100% !important;
     }
 
+    /* ----- Plotly 触屏体验修复 -----
+       默认 Plotly 给图表容器加了 touch-action: none，导致：
+       1) 双指捏合无法缩放整个页面
+       2) 单指点击会被吃掉，体验奇怪
+       这里把 touch-action 放开，允许浏览器原生的滚动 + 捏合缩放。 */
+    .js-plotly-plot, .plotly, .main-svg {
+        touch-action: pan-x pan-y pinch-zoom !important;
+    }
+
     /* ----- 移动端响应式（屏宽 < 768px 时生效）----- */
     @media (max-width: 768px) {
         /* 主区域内边距压缩，给图表更多空间 */
@@ -332,9 +341,13 @@ else:
         )
 
         # 散点样式：移动端会通过 layout autosize 自动适配宽度
+        # 关键：显式设置 selected / unselected 样式与默认一致，
+        # 避免触屏上"轻触圆点"被识别为 box-select 后未选中点被 dim 成几乎不可见。
         fig.update_traces(
             marker=dict(size=11, opacity=0.85, line=dict(width=1, color="white")),
             jitter=0.4,
+            selected=dict(marker=dict(opacity=0.85)),
+            unselected=dict(marker=dict(opacity=0.85)),
         )
 
         # Y 轴：标题「Rating」加粗
@@ -366,7 +379,6 @@ else:
         )
 
         fig.update_layout(
-            # 高度按学校数量微调，单图永远适应屏幕
             height=520,
             autosize=True,
             legend=dict(
@@ -379,15 +391,24 @@ else:
             ),
             plot_bgcolor="white",
             title_font_size=16,
-            margin=dict(l=50, r=30, t=70, b=50),  # 右边距收紧
+            margin=dict(l=50, r=30, t=70, b=50),
             hovermode="closest",
+            # 关键修复：禁用拖拽缩放/选区
+            # 默认 dragmode='zoom' 会让触屏上的"轻触圆点"被识别为画一个极小的选框，
+            # 进而 box-select → 选区外的所有点被 dim → 视觉上"消失"。
+            # 改为 False 后，圆点点击只会触发 hover，不会再误触。
+            dragmode=False,
+            # clickmode='event' 而非默认的 'event+select'，
+            # 让点击只产生 hover 事件，不再切换选中态。
+            clickmode="event",
         )
 
-        # 关键性能优化：
-        # 1) displayModeBar=False     → 隐藏 Plotly 顶部工具栏（少加载~100KB JS + 减少渲染）
-        # 2) staticPlot=False         → 保留 hover 交互，但禁用复杂动效
-        # 3) responsive=True          → 跟随容器宽度变化自适应（移动端关键）
-        # 4) scrollZoom=False         → 禁用滚轮缩放，避免移动端误触
+        # Plotly 渲染配置：
+        # - displayModeBar=False  隐藏顶部工具栏（少加载 ~100KB JS）
+        # - responsive=True       跟随容器宽度变化自适应
+        # - scrollZoom=False      禁用滚轮缩放（避免移动端滚动页面时误触图表）
+        # - doubleClick=False     禁用双击重置缩放（避免移动端双击放大文字时误触）
+        # - staticPlot 保持 False，仍允许 hover 提示
         st.plotly_chart(
             fig,
             use_container_width=True,
@@ -395,6 +416,7 @@ else:
                 "displayModeBar": False,
                 "responsive": True,
                 "scrollZoom": False,
+                "doubleClick": False,
                 "staticPlot": False,
             },
         )
