@@ -172,6 +172,49 @@ def build_summary(df: pd.DataFrame, school_order: list) -> pd.DataFrame:
     return summary_df
 
 
+def _strip_chart_x_axis_style(chunk: list) -> dict:
+    """横轴学校名自适应：根据学校数量与最长校名长度决定倾斜角、字号与下边距。
+    不依赖浏览器宽度检测，窄屏与宽屏共用一套保守规则，避免手机端标签重叠。"""
+    if not chunk:
+        return {
+            "tickangle": 0,
+            "tickfont_size": 14,
+            "margin_b": 58,
+            "chart_height": 520,
+        }
+
+    n = len(chunk)
+    max_len = max(len(str(s)) for s in chunk)
+
+    # 规则说明：
+    # - 学校少且名称短 → 水平标签，桌面最清爽
+    # - 学校变多或名称变长 → 逐级加大倾斜角并缩小字号、抬高下边距
+    if n <= 2 and max_len <= 11:
+        angle, tf, mb = 0, 14, 60
+    elif n <= 3 and max_len <= 14:
+        angle, tf, mb = -22, 13, 78
+    elif n <= 4 and max_len <= 18:
+        angle, tf, mb = -35, 12, 105
+    elif n <= 6:
+        angle, tf, mb = -45, max(10, 12 - n // 6), min(150, 110 + max_len)
+    else:
+        angle, tf, mb = -52, max(9, 11 - n // 8), min(175, 125 + max_len // 2)
+
+    # 超长校名额外预留下边距（倾斜后占位更大）
+    if max_len > 16:
+        mb = min(185, mb + (max_len - 16) * 2)
+
+    # 倾斜越大，整体高度略增，避免绘图区被压缩得过扁
+    chart_h = 520 + max(0, abs(angle) - 25) // 8 * 12 + max(0, mb - 95) // 6
+
+    return {
+        "tickangle": angle,
+        "tickfont_size": tf,
+        "margin_b": mb,
+        "chart_height": min(720, chart_h),
+    }
+
+
 # ====================== 4. 会话状态初始化 ======================
 if "tony_rating" not in st.session_state:
     st.session_state.tony_rating = DEFAULT_TONY_RATING
@@ -309,7 +352,8 @@ else:
         y_min, y_max = 3.0, 7.0
 
     # ----- 把 SCHOOL_ORDER 切成多组，每组最多 SCHOOLS_PER_CHART 所学校 -----
-    SCHOOLS_PER_CHART = 7
+    # 每张图最多 5 所学校，确保手机端横轴标签也有足够宽度展示
+    SCHOOLS_PER_CHART = 5
     school_chunks = [
         SCHOOL_ORDER[i : i + SCHOOLS_PER_CHART]
         for i in range(0, len(SCHOOL_ORDER), SCHOOLS_PER_CHART)
@@ -335,10 +379,13 @@ else:
             category_orders={"School": chunk, "Grade": GRADE_ORDER},
             color_discrete_map=COLOR_MAP,
             stripmode="overlay",
-            # 精简 hover 字段，减少传输到前端的数据量
-            hover_data={"Rating": ":.2f", "Grade": True, "School": False},
+            # hover 中带学校名：横轴倾斜后仍可一眼确认是哪所学校
+            hover_data={"School": True, "Rating": ":.2f", "Grade": True},
             title=chart_title,
         )
+
+        # 横轴标签自适应（数量 + 名称长度），避免手机与桌面端学校名重叠
+        xa = _strip_chart_x_axis_style(chunk)
 
         # 散点样式：移动端会通过 layout autosize 自动适配宽度
         # 关键：显式设置 selected / unselected 样式与默认一致，
@@ -358,12 +405,18 @@ else:
             gridcolor="#e5e5e5",
             automargin=True,
         )
-        # X 轴：去掉「学校」标题；学校名加粗 + 自动旋转避免重叠
+        # X 轴：去掉「学校」标题；学校名倾斜 + 字号随密度变化，保证窄屏不重叠
+        # 使用常规无衬线体，小字号倾斜时比超粗体更易读
         fig.update_xaxes(
             title=None,
-            tickfont=dict(size=14, color="#1f2937", family="Arial Black, sans-serif"),
-            tickangle=0,
+            tickfont=dict(
+                size=xa["tickfont_size"],
+                color="#1f2937",
+                family="Segoe UI, Arial, Helvetica, sans-serif",
+            ),
+            tickangle=xa["tickangle"],
             automargin=True,
+            # 学校名在 hover 中仍显示完整，横轴以不重叠为优先
         )
 
         # Tony 的水平基准线 + 右侧注释（位置随 Tony 分数实时移动）
@@ -379,7 +432,7 @@ else:
         )
 
         fig.update_layout(
-            height=520,
+            height=xa["chart_height"],
             autosize=True,
             legend=dict(
                 title_text="年级",
@@ -391,7 +444,7 @@ else:
             ),
             plot_bgcolor="white",
             title_font_size=16,
-            margin=dict(l=50, r=30, t=70, b=50),
+            margin=dict(l=50, r=30, t=70, b=xa["margin_b"]),
             hovermode="closest",
             # 关键修复：禁用拖拽缩放/选区
             # 默认 dragmode='zoom' 会让触屏上的"轻触圆点"被识别为画一个极小的选框，
