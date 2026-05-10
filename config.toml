@@ -1,0 +1,11 @@
+# Streamlit 主题配置
+# 把全局 primaryColor 改为绿色，这会同时影响：
+#   - 复选框选中态颜色（学校选取菜单）
+#   - type="primary" 的按钮背景色（如「✅ 全选」）
+#   - 滑块、链接等其他依赖主色调的组件
+[theme]
+primaryColor = "#22c55e"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F5F7FA"
+textColor = "#262730"
+font = "sans serif"
