@@ -20,14 +20,21 @@ st.set_page_config(
     page_title="寄宿美高壁球校队 Rating 对比面板",
     page_icon="🎯",
     layout="wide",
+    # 移动端默认收起侧边栏，节省横向空间；桌面端保持展开
+    initial_sidebar_state="auto",
+    menu_items={
+        "About": "寄宿美高壁球校队 Rating 对比面板 · 用于评估申请人 Tony 的相对竞争力",
+    },
 )
 
-# 自定义 CSS：给「全不选」按钮上一抹柔和的琥珀色，与绿色的「全选」形成清晰对比
-# Streamlit 会把 widget 的 key 写入容器的 class 属性中，形如 st-key-{key}
+# 自定义 CSS：
+# 1) 「全不选」按钮上一抹柔和的琥珀色
+# 2) 移动端响应式优化：缩小标题字号、压缩内边距、减少滚动条占用
+# 3) 让加粗等元素在窄屏下也清晰可读
 st.markdown(
     """
     <style>
-    /* 「全不选」按钮：柔和琥珀色 */
+    /* ----- 「全不选」按钮：柔和琥珀色 ----- */
     .st-key-btn_clear_all_schools button {
         background-color: #fef3c7 !important;
         color: #92400e !important;
@@ -37,6 +44,56 @@ st.markdown(
         background-color: #fde68a !important;
         color: #78350f !important;
         border-color: #f59e0b !important;
+    }
+
+    /* ----- 桌面端：让主区域两侧留点呼吸空间但不浪费 ----- */
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        max-width: 100% !important;
+    }
+
+    /* ----- 移动端响应式（屏宽 < 768px 时生效）----- */
+    @media (max-width: 768px) {
+        /* 主区域内边距压缩，给图表更多空间 */
+        .block-container {
+            padding-left: 0.6rem !important;
+            padding-right: 0.6rem !important;
+            padding-top: 0.8rem !important;
+        }
+        /* 主标题缩小，避免占满整屏 */
+        h1 {
+            font-size: 1.4rem !important;
+            line-height: 1.3 !important;
+        }
+        h2 {
+            font-size: 1.15rem !important;
+        }
+        h3, h4 {
+            font-size: 1rem !important;
+        }
+        /* 表格在移动端允许横向滚动而不是溢出 */
+        [data-testid="stDataFrame"] {
+            overflow-x: auto !important;
+        }
+        /* 缩小数据表的行高，让"完整展开"在小屏上仍然紧凑 */
+        [data-testid="stDataFrame"] [role="row"] {
+            min-height: 30px !important;
+        }
+        /* 关键指标的文本不要换行截断 */
+        .stMarkdown p {
+            word-break: break-word !important;
+        }
+    }
+
+    /* ----- 超窄屏（< 480px，小手机）：进一步压缩 ----- */
+    @media (max-width: 480px) {
+        h1 {
+            font-size: 1.2rem !important;
+        }
+        .stCaption, [data-testid="stCaptionContainer"] {
+            font-size: 0.75rem !important;
+        }
     }
     </style>
     """,
@@ -269,30 +326,34 @@ else:
             category_orders={"School": chunk, "Grade": GRADE_ORDER},
             color_discrete_map=COLOR_MAP,
             stripmode="overlay",
-            hover_data={"School": True, "Rating": ":.2f", "Grade": True},
+            # 精简 hover 字段，减少传输到前端的数据量
+            hover_data={"Rating": ":.2f", "Grade": True, "School": False},
             title=chart_title,
         )
 
-        # 美化散点：增大尺寸、增加抖动
+        # 散点样式：移动端会通过 layout autosize 自动适配宽度
         fig.update_traces(
-            marker=dict(size=12, opacity=0.85, line=dict(width=1, color="white")),
+            marker=dict(size=11, opacity=0.85, line=dict(width=1, color="white")),
             jitter=0.4,
         )
 
-        # Y 轴：标题「Rating」加粗 + 字号加大
+        # Y 轴：标题「Rating」加粗
         fig.update_yaxes(
             range=[y_min, y_max],
-            title=dict(text="<b>Rating</b>", font=dict(size=18)),
-            tickfont=dict(size=14),
+            title=dict(text="<b>Rating</b>", font=dict(size=16)),
+            tickfont=dict(size=13),
             gridcolor="#e5e5e5",
+            automargin=True,
         )
-        # X 轴：去掉「学校」标题；学校名加粗 + 字号加大
+        # X 轴：去掉「学校」标题；学校名加粗 + 自动旋转避免重叠
         fig.update_xaxes(
             title=None,
-            tickfont=dict(size=16, color="#1f2937", family="Arial Black, sans-serif"),
+            tickfont=dict(size=14, color="#1f2937", family="Arial Black, sans-serif"),
+            tickangle=0,
+            automargin=True,
         )
 
-        # 绘制 Tony 的水平基准线 + 右侧注释（位置随 Tony 分数实时移动）
+        # Tony 的水平基准线 + 右侧注释（位置随 Tony 分数实时移动）
         fig.add_hline(
             y=TONY_RATING,
             line_dash="dash",
@@ -301,18 +362,42 @@ else:
             annotation_text=f"Tony ({TONY_RATING:.2f})",
             annotation_position="right",
             annotation_font_color="red",
-            annotation_font_size=14,
+            annotation_font_size=13,
         )
 
         fig.update_layout(
-            height=600,
-            legend_title_text="年级",
+            # 高度按学校数量微调，单图永远适应屏幕
+            height=520,
+            autosize=True,
+            legend=dict(
+                title_text="年级",
+                orientation="h",        # 横向图例（移动端节省纵向空间）
+                yanchor="bottom",
+                y=1.02,
+                xanchor="right",
+                x=1,
+            ),
             plot_bgcolor="white",
-            title_font_size=18,
-            margin=dict(l=60, r=80, t=70, b=60),
+            title_font_size=16,
+            margin=dict(l=50, r=30, t=70, b=50),  # 右边距收紧
+            hovermode="closest",
         )
 
-        st.plotly_chart(fig, use_container_width=True)
+        # 关键性能优化：
+        # 1) displayModeBar=False     → 隐藏 Plotly 顶部工具栏（少加载~100KB JS + 减少渲染）
+        # 2) staticPlot=False         → 保留 hover 交互，但禁用复杂动效
+        # 3) responsive=True          → 跟随容器宽度变化自适应（移动端关键）
+        # 4) scrollZoom=False         → 禁用滚轮缩放，避免移动端误触
+        st.plotly_chart(
+            fig,
+            use_container_width=True,
+            config={
+                "displayModeBar": False,
+                "responsive": True,
+                "scrollZoom": False,
+                "staticPlot": False,
+            },
+        )
 
     # ====================== 9. 数据汇总表 ======================
     st.subheader("📊 各校换血率与竞争门槛分析")
