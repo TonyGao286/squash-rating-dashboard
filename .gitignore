@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.venv/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
+
+# 项目专属：本地草稿/临时文件，不上传到仓库
+新建*/
+新建*.docx
+*.html
+Tony_Placement_Strategy.html
+校单.docx
+校单.md
+目标学校交叉对照.md

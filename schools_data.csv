@@ -1,0 +1,174 @@
+School,Rating,Grade
+Loomis,5.53,G12
+Loomis,4.98,G12
+Loomis,5.15,G10
+Loomis,5.09,G12
+Loomis,4.67,G11
+Loomis,4.85,G9
+Loomis,4.38,G9
+Loomis,4.47,G9
+Loomis,4.49,G11
+Loomis,4.31,G10
+Groton,5.57,G12
+Groton,5.46,G12
+Groton,5,G12
+Groton,5.06,G9
+Groton,4.99,G12
+Groton,4.68,G10
+Groton,4.73,G9
+Groton,4.42,G11
+Groton,4.42,G12
+Groton,4.31,G12
+Groton,3.92,G9
+SPS,5.48,G11
+SPS,5.4,G11
+SPS,5.37,G9
+SPS,4.82,G12
+SPS,4.37,G11
+SPS,4.41,G9
+SPS,4.39,G12
+SPS,4.24,G9
+SPS,4.2,G9
+SPS,4.22,G11
+SPS,4.15,G11
+Choate,6.09,G11
+Choate,5.94,G10
+Choate,5.76,G12
+Choate,5.59,G9
+Choate,4.83,G12
+Choate,4.72,G11
+Choate,4.65,G10
+Choate,4.77,G9
+Choate,4.49,G10
+Choate,4.32,G11
+Berkshire,6.71,G12
+Berkshire,5.75,G10
+Berkshire,4.88,G12
+Berkshire,4.61,G12
+Berkshire,4.41,G12
+Berkshire,4.47,G11
+Berkshire,4.52,G9
+Berkshire,3.88,G12
+Berkshire,4.17,G9
+Berkshire,3.9,G10
+Deerfield,6.66,G12
+Deerfield,6.22,G12
+Deerfield,5.74,G12
+Deerfield,5.69,G12
+Deerfield,5.39,G10
+Deerfield,5.23,G9
+Deerfield,4.57,G9
+Deerfield,4.77,G9
+Deerfield,5.96,G12
+Deerfield,4.63,G9
+Deerfield,5.14,G10
+Deerfield,4.39,G9
+Pomfret,5.09,G12
+Pomfret,4.66,G12
+Pomfret,4.52,G12
+Pomfret,4.46,G12
+Pomfret,4.08,G10
+Pomfret,3.72,G9
+Pomfret,3.4,G9
+Pomfret,3.95,G9
+Pomfret,3.68,G9
+Pomfret,3.21,G9
+St.Marks ,5.29,G12
+St.Marks ,4.09,G9
+St.Marks ,3.91,G10
+St.Marks ,3.62,G10
+St.Marks ,3.73,G10
+St.Marks ,3.47,G11
+St.Marks ,3.28,G10
+St.Marks ,3.42,G10
+Brooks,4.63,G12
+Brooks,4.54,G11
+Brooks,4.57,G12
+Brooks,4.24,G11
+Brooks,4.23,G10
+Brooks,4.02,G10
+Brooks,3.33,G9
+Brooks,3.25,G9
+Concord ,4.84,G11
+Concord ,4.55,G12
+Concord ,4.43,G12
+Concord ,4.44,G12
+Concord ,3.94,G12
+Concord ,3.77,G9
+Concord ,3.44,G11
+Concord ,2.97,G11
+Concord ,3.77,G11
+Concord ,3.65,G12
+Middlesex,3.16,G12
+Middlesex,4.49,G11
+Middlesex,3.47,G9
+Middlesex,4.22,G12
+Middlesex,4.57,G12
+Middlesex,4.86,G12
+Middlesex,4.22,G12
+Middlesex,3.52,G11
+Middlesex,4.13,G9
+Milton,5.95,G12
+Milton,5.22,G11
+Milton,4.97,G11
+Milton,4.75,G10
+Milton,4.75,G12
+Milton,4.47,G10
+Milton,4.51,G12
+Milton,4.22,G9
+Milton,4.15,G9
+Milton,3.95,G10
+Milton,3.9,G9
+Taft,4.56,G9
+Taft,6.02,G12
+Taft,3.75,G12
+Taft,3.85,G12
+Taft,4.32,G12
+Taft,5.9,G12
+Taft,6.4,G12
+Taft,4,G12
+Taft,4.23,G11
+Andover,6.3,G12
+Andover,6.19,G11
+Andover,5.77,G11
+Andover,5.78,G9
+Andover,5.32,G12
+Andover,5.46,G12
+Andover,5.34,G12
+Andover,5.23,G12
+Andover,5.08,G12
+Andover,4.49,G11
+Andover,4.54,G12
+Andover,4.7,G12
+Exter,5.23,G12
+Exter,5.23,G12
+Exter,5.12,G11
+Exter,5.12,G12
+Exter,5.22,G11
+Exter,4.85,G11
+Exter,4.9,G10
+Exter,4.94,G12
+Exter,4.28,G12
+Exter,4.67,G12
+Exter,3.76,G10
+Exter,4.11,G10
+Exter,4.55,G9
+Exter,4.77,G9
+Exter,3.2,G9
+Exter,4.15,G12
+Exter,4.7,G12
+Exter,3.52,G10
+Exter,4.79,G12
+Exter,4.34,G10
+Exter,4.14,G10
+Exter,4.24,G12
+Kent,6.08,G12
+Kent,5.85,G12
+Kent,5.87,G12
+Kent,5.48,G12
+Kent,5.38,G12
+Kent,4.82,G12
+Kent,4.48,G12
+Kent,4.33,G12
+Kent,4.49,G10
+Kent,4.2,G12
